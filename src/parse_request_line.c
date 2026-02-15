@@ -2,20 +2,10 @@
 // Created by dontknow on 1/30/26.
 //
 
-#include "../include/request_line_parser.h"
+#include "../include/parse_request_line.h"
 #include <stdio.h>
-
-void split_at_char(char *str, char c, char **second_part) {
-    while (*str != '\0') {
-        if (*str == c) {
-            *str = '\0';
-            *second_part = str + 1;
-            return;
-        }
-        str++;
-    }
-    *second_part = NULL;
-}
+#include "../include/utils.h"
+#include "string.h"
 
 int parse_request_line(char *str, struct http_request *req) {
     char *current = str;
@@ -27,11 +17,11 @@ int parse_request_line(char *str, struct http_request *req) {
     //METHOD
     split_at_char(current, ' ', &next);
     if (next == NULL) {
-        perror("Request line is missing elements or is corrupted");
+        fprintf(stderr, "Request line is missing elements or is corrupted");
         return -1;
     }
     if (!check_method(current)) {
-        perror("Method is not valid");
+        fprintf(stderr, "Method is not valid");
         return -1;
     }
     temp_method = current;
@@ -40,15 +30,15 @@ int parse_request_line(char *str, struct http_request *req) {
     //URI
     split_at_char(current, ' ', &next);
     if (next == NULL) {
-        perror("Request line is missing elements or is corrupted");
+        fprintf(stderr, "Request line is missing elements or is corrupted");
         return -1;
     }
     if (!check_uri(current)) {
         fprintf(stderr, "Url is not valid");
         return -1;
     }
-    current = next;
     temp_uri = current;
+    current = next;
 
     //VERSION
     split_at_char(current, ' ', &next);
